@@ -1,6 +1,7 @@
 from pm4py.objects.log.importer.xes import importer as xes_importer
 from pm4py.objects.conversion.log import converter as log_converter
 from paho.mqtt.client import Client, MQTTMessageInfo
+from pathlib import Path
 import arrow
 import json
 import sys
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     log = xes_importer.apply(file)
     df = log_converter.apply(log, variant=log_converter.TO_DATA_FRAME)
 
-    file_name = file.replace('.xes', '')
+    file_name = Path(file).stem
 
     for index, row in df.iterrows():
         row_d = row.to_dict()
