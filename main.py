@@ -17,7 +17,9 @@ if __name__ == '__main__':
     mqtt_client = setup_mqtt_client(sys.argv[2], int(sys.argv[3]))
 
     file = sys.argv[1]
-    log = xes_importer.apply(file)
+    variant = xes_importer.Variants.ITERPARSE
+    parameters = {variant.value.Parameters.TIMESTAMP_SORT: True}
+    log = xes_importer.apply(file,variant=variant, parameters=parameters)
     df = log_converter.apply(log, variant=log_converter.TO_DATA_FRAME)
 
     file_name = Path(file).stem
