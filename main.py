@@ -5,6 +5,7 @@ from pathlib import Path
 import arrow
 import json
 import sys
+import time
 
 
 def setup_mqtt_client(broker: str, port: int) -> Client:
@@ -15,6 +16,8 @@ def setup_mqtt_client(broker: str, port: int) -> Client:
 
 if __name__ == '__main__':
     mqtt_client = setup_mqtt_client(sys.argv[2], int(sys.argv[3]))
+    topic = sys.argv[4]
+    delay = float(sys.argv[5])
 
     file = sys.argv[1]
     variant = xes_importer.Variants.ITERPARSE
@@ -26,7 +29,7 @@ if __name__ == '__main__':
 
     for index, row in df.iterrows():
         row_d = row.to_dict()
-        topic = f'02269_pm_group9/{file_name}/{row_d["case:concept:name"]}/{row_d["concept:name"]}'
+        topic = f'{topic}/{file_name}/{row_d["case:concept:name"]}/{row_d["concept:name"]}'
         payload = dict()
         if 'time:timestamp' in row_d:
             timestamp = arrow.get(row_d['time:timestamp'])
@@ -35,3 +38,4 @@ if __name__ == '__main__':
             payload = {'timestamp': arrow.utcnow().timestamp()}
         result: MQTTMessageInfo = mqtt_client.publish(topic=topic, payload=json.dumps(payload), qos=0, retain=False)
         print(f'Published to "{topic}" with result code {result.rc}')
+        time.sleep(delay)
