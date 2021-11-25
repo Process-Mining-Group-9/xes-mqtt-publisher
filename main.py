@@ -36,6 +36,6 @@ if __name__ == '__main__':
             payload = {'timestamp': timestamp.timestamp()}
         else:
             payload = {'timestamp': arrow.utcnow().timestamp()}
-        result: MQTTMessageInfo = mqtt_client.publish(topic=topic, payload=json.dumps(payload), qos=0, retain=False)
+        result: MQTTMessageInfo = mqtt_client.publish(topic=topic, payload=json.dumps(payload), qos=2, retain=False)
         print(f'Published to "{topic}" with result code {result.rc}')
         time.sleep(delay)
