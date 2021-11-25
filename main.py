@@ -1,21 +1,14 @@
 from pm4py.objects.log.importer.xes import importer as xes_importer
 from pm4py.objects.conversion.log import converter as log_converter
-from paho.mqtt.client import Client, MQTTMessageInfo
 from pathlib import Path
+import paho.mqtt.publish
 import arrow
 import json
 import sys
 import time
 
 
-def setup_mqtt_client(broker: str, port: int) -> Client:
-    client = Client()
-    client.connect(broker, port, 60)
-    return client
-
-
 if __name__ == '__main__':
-    mqtt_client = setup_mqtt_client(sys.argv[2], int(sys.argv[3]))
     base_topic = sys.argv[4]
     delay = float(sys.argv[5])
 
@@ -36,6 +29,6 @@ if __name__ == '__main__':
             payload = {'timestamp': timestamp.timestamp()}
         else:
             payload = {'timestamp': arrow.utcnow().timestamp()}
-        result: MQTTMessageInfo = mqtt_client.publish(topic=topic, payload=json.dumps(payload), qos=2, retain=False)
-        print(f'Published to "{topic}" with result code {result.rc}')
+        paho.mqtt.publish.single(topic=topic, payload=json.dumps(payload), qos=2, retain=False, hostname=sys.argv[2], port=int(sys.argv[3]))
+        print(f'Published to "{topic}" and disconnected client.')
         time.sleep(delay)
